@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إدارة الأقسام | لوحة الأدمن</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #00f7ff;
+    }
+
+    input, select {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin: 5px;
+      font-family: 'Cairo', sans-serif;
+      width: 250px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: linear-gradient(45deg, #00f7ff, #ff00ff);
+      border: none;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #111;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      box-shadow: 0 0 10px #00f7ff;
+    }
+
+    .delete-btn {
+      background: red;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📚 إدارة الأقسام والخدمات</h1>
+
+  <h2>➕ إضافة قسم جديد</h2>
+  <input type="text" id="sectionId" placeholder="معرف القسم (مثلاً: cyber)">
+  <input type="text" id="sectionTitle" placeholder="عنوان القسم">
+  <select id="sectionStatus">
+    <option value="true">مفعل ✅</option>
+    <option value="false">معطل ❌</option>
+  </select>
+  <br>
+  <button onclick="addSection()">➕ إضافة القسم</button>
+
+  <h2>📂 الأقسام الحالية</h2>
+  <ul id="sectionList"></ul>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTQ7sUS5VrIY7wIIq-BVjYYWLygCtQOHY",
+      authDomain: "el-samurai-cod-ai.firebaseapp.com",
+      databaseURL: "https://el-samurai-cod-ai-default-rtdb.firebaseio.com",
+      projectId: "el-samurai-cod-ai",
+      storageBucket: "el-samurai-cod-ai.appspot.com",
+      messagingSenderId: "947619246455",
+      appId: "1:947619246455:web:df4fe0fae7f5d5aee73172"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // إضافة قسم جديد
+    window.addSection = async () => {
+      const id = document.getElementById("sectionId").value.trim();
+      const title = document.getElementById("sectionTitle").value.trim();
+      const active = document.getElementById("sectionStatus").value === "true";
+
+      if (!id || !title) return alert("❌ أدخل كل البيانات");
+
+      const path = ref(db, "services/" + id);
+      await set(path, {
+        id,
+        title,
+        active,
+        items: {}
+      });
+
+      alert("✅ تم إضافة القسم بنجاح");
+      document.getElementById("sectionId").value = "";
+      document.getElementById("sectionTitle").value = "";
+    };
+
+    // عرض الأقسام
+    const sectionList = document.getElementById("sectionList");
+    const servicesRef = ref(db, "services");
+
+    onValue(servicesRef, (snapshot) => {
+      sectionList.innerHTML = "";
+      if (!snapshot.exists()) return;
+      const data = snapshot.val();
+
+      for (const id in data) {
+        const sec = data[id];
+        const li = document.createElement("li");
+        li.innerHTML = `
+          📂 <strong>${sec.title}</strong> <br>
+          🆔 ID: ${id} | ${sec.active ? "✅ مفعل" : "❌ معطل"}
+          <br>
+          <button class="delete-btn" onclick="deleteSection('${id}')">🗑️ حذف القسم</button>
+        `;
+        sectionList.appendChild(li);
+      }
+    });
+
+    // حذف قسم
+    window.deleteSection = async (id) => {
+      if (!confirm("هل تريد حذف هذا القسم؟")) return;
+      await remove(ref(db, "services/" + id));
+    };
+  </script>
+
+</body>
+</html>

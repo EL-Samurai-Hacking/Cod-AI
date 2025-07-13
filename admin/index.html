@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تسجيل دخول الأدمن | EL Samurai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: #111;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #00f7ff;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h2 {
+      color: #00f7ff;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    button {
+      background: linear-gradient(45deg, #ff00ff, #00f7ff);
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #000;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 0 10px #00f7ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>🔐 دخول الأدمن</h2>
+    <input type="password" id="adminPass" placeholder="ادخل كلمة السر">
+    <button onclick="checkPassword()">دخول</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTQ7sUS5VrIY7wIIq-BVjYYWLygCtQOHY",
+      authDomain: "el-samurai-cod-ai.firebaseapp.com",
+      projectId: "el-samurai-cod-ai",
+      storageBucket: "el-samurai-cod-ai.appspot.com",
+      messagingSenderId: "947619246455",
+      appId: "1:947619246455:web:df4fe0fae7f5d5aee73172",
+      measurementId: "G-EYR30QTGLS",
+      databaseURL: "https://el-samurai-cod-ai-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+
+    // التحقق من كلمة السر
+    window.checkPassword = async () => {
+      const input = document.getElementById("adminPass").value.trim();
+      if (!input) return alert("❌ أدخل كلمة السر");
+
+      const snap = await get(ref(db, "admin/password"));
+      if (!snap.exists()) return alert("⚠️ لم يتم إعداد كلمة السر");
+
+      const realPass = snap.val();
+      if (input === realPass) {
+        // حفظ دخول الأدمن
+        localStorage.setItem("adminLoggedIn", "true");
+        alert("✅ تم تسجيل الدخول بنجاح");
+        location.href = "dashboard.html"; // ← غيرها لاسم لوحة التحكم
+      } else {
+        alert("❌ كلمة السر غير صحيحة");
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>لوحة تحكم الأدمن</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #00f7ff;
+    }
+
+    .logout {
+      float: left;
+      background: red;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="logout" onclick="logout()">🚪 تسجيل الخروج</button>
+  <h1>🔥 مرحباً بك في لوحة تحكم الأدمن</h1>
+
+  <p>من هنا تقدر تتحكم في كل حاجة: الأكواد، الأقسام، الخدمات، الأدوات، وغيرهم.</p>
+
+  <!-- ممكن تضيف هنا روابط للأقسام -->
+  <ul>
+    <li><a href="codes.html">إدارة أكواد التفعيل</a></li>
+    <li><a href="sections.html">إدارة الأقسام والخدمات</a></li>
+    <li><a href="settings.html">إعدادات الموقع</a></li>
+  </ul>
+
+  <script>
+    // حماية: منع الدخول إذا ما سجلش الأدمن
+    if (localStorage.getItem("adminLoggedIn") !== "true") {
+      alert("❌ غير مصرح لك بالدخول");
+      window.location.href = "index.html";
+    }
+
+    // تسجيل الخروج
+    function logout() {
+      localStorage.removeItem("adminLoggedIn");
+      alert("🚪 تم تسجيل الخروج");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

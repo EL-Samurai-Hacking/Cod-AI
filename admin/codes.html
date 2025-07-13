@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>إدارة الأكواد | لوحة تحكم الأدمن</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #00f7ff;
+    }
+    input {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin: 5px 0;
+      width: 250px;
+      font-family: 'Cairo', sans-serif;
+    }
+    button {
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #00f7ff, #ff00ff);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #111;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+      box-shadow: 0 0 10px #00f7ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>📜 إدارة أكواد التفعيل</h1>
+
+  <input type="text" id="codeInput" placeholder="أدخل الكود الجديد">
+  <input type="number" id="minutesInput" placeholder="المدة بالدقائق" min="30" value="30">
+  <br>
+  <button onclick="addCode()">➕ إضافة الكود</button>
+
+  <h2>🗂️ الأكواد الحالية:</h2>
+  <ul id="codesList"></ul>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTQ7sUS5VrIY7wIIq-BVjYYWLygCtQOHY",
+      authDomain: "el-samurai-cod-ai.firebaseapp.com",
+      databaseURL: "https://el-samurai-cod-ai-default-rtdb.firebaseio.com",
+      projectId: "el-samurai-cod-ai",
+      storageBucket: "el-samurai-cod-ai.appspot.com",
+      messagingSenderId: "947619246455",
+      appId: "1:947619246455:web:df4fe0fae7f5d5aee73172"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // إضافة كود جديد
+    window.addCode = async () => {
+      const code = document.getElementById("codeInput").value.trim();
+      const minutes = parseInt(document.getElementById("minutesInput").value.trim());
+
+      if (!code || minutes < 30) {
+        alert("❌ تأكد من إدخال الكود والمدة (أقل مدة 30 دقيقة)");
+        return;
+      }
+
+      const codeRef = ref(db, "activationCodes/" + code);
+      await set(codeRef, {
+        used: false,
+        durationMinutes: minutes,
+        createdAt: Date.now()
+      });
+
+      alert("✅ تم إضافة الكود بنجاح");
+      document.getElementById("codeInput").value = "";
+    };
+
+    // عرض الأكواد
+    const list = document.getElementById("codesList");
+    const codesRef = ref(db, "activationCodes");
+
+    onValue(codesRef, (snapshot) => {
+      list.innerHTML = "";
+      if (!snapshot.exists()) return;
+
+      const data = snapshot.val();
+      for (const code in data) {
+        const c = data[code];
+        const li = document.createElement("li");
+        li.innerHTML = `🔑 ${code} | 🕒 ${c.durationMinutes} دقيقة | ${c.used ? "❌ مستخدم" : "✅ غير مستخدم"}`;
+        list.appendChild(li);
+      }
+    });
+  </script>
+</body>
+</html>

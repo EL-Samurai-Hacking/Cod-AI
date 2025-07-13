@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>إعدادات الموقع | لوحة تحكم الأدمن</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #00f7ff;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #ff00ff, #00f7ff);
+      border: none;
+      color: #000;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00f7ff;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>⚙️ إعدادات الموقع</h1>
+
+  <input type="text" id="openaiKey" placeholder="🔑 مفتاح OpenAI">
+  <input type="text" id="whatsapp" placeholder="📞 رقم الواتساب للتجديد">
+  <input type="text" id="welcomeText" placeholder="💬 رسالة الترحيب الرئيسية">
+  <button onclick="saveSettings()">💾 حفظ الإعدادات</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTQ7sUS5VrIY7wIIq-BVjYYWLygCtQOHY",
+      authDomain: "el-samurai-cod-ai.firebaseapp.com",
+      projectId: "el-samurai-cod-ai",
+      storageBucket: "el-samurai-cod-ai.appspot.com",
+      messagingSenderId: "947619246455",
+      appId: "1:947619246455:web:df4fe0fae7f5d5aee73172",
+      databaseURL: "https://el-samurai-cod-ai-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+
+    // تحميل الإعدادات القديمة
+    const settingsRef = ref(db, "settings");
+    get(settingsRef).then(snapshot => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        document.getElementById("openaiKey").value = data.openaiApiKey || "";
+        document.getElementById("whatsapp").value = data.whatsapp || "";
+        document.getElementById("welcomeText").value = data.welcomeText || "";
+      }
+    });
+
+    // حفظ الإعدادات
+    window.saveSettings = async () => {
+      const openaiKey = document.getElementById("openaiKey").value.trim();
+      const whatsapp = document.getElementById("whatsapp").value.trim();
+      const welcomeText = document.getElementById("welcomeText").value.trim();
+
+      if (!openaiKey || !whatsapp || !welcomeText) {
+        return alert("❌ الرجاء إدخال جميع الحقول");
+      }
+
+      await set(settingsRef, {
+        openaiApiKey: openaiKey,
+        whatsapp: whatsapp,
+        welcomeText: welcomeText
+      });
+
+      alert("✅ تم حفظ الإعدادات بنجاح");
+    };
+  </script>
+</body>
+</html>
