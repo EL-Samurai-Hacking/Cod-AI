@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تفعيل الاشتراك | EL Samurai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #0a0a0a;
+      font-family: 'Cairo', sans-serif;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: #111;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #ff00ff, 0 0 40px #00f7ff inset;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #ff00ff;
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #ff00ff;
+    }
+
+    .uid {
+      background: #222;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: inline-block;
+      font-size: 18px;
+      color: #00f7ff;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      background: linear-gradient(45deg, #ff00ff, #00f7ff);
+      color: #000;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 0 15px #00f7ff;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>حسابك غير مفعل ❌</h1>
+    <p>يرجى تفعيل الاشتراك باستخدام كود التفعيل أو التواصل مع الإدارة.</p>
+    <p class="uid" id="uid">جارٍ التحميل...</p>
+    
+    <a href="activate.html" class="btn">🔑 إدخال كود التفعيل</a>
+    <a href="https://wa.me/201508038584" class="btn">💬 تواصل مع الإدارة (واتساب)</a>
+  </div>
+
+  <script>
+    const uid = localStorage.getItem("customUID");
+    document.getElementById("uid").textContent = "معرّفك: " + uid;
+  </script>
+</body>
+</html>

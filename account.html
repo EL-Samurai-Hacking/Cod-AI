@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>حسابي | EL Samurai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: #0a0a0a;
+      font-family: 'Cairo', sans-serif;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #111;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #ff00ff, 0 0 40px #00f7ff inset;
+      text-align: center;
+    }
+
+    h1 {
+      color: #00f7ff;
+      margin-bottom: 25px;
+    }
+
+    .info {
+      font-size: 18px;
+      color: #ccc;
+      margin: 10px 0;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #ff00ff, #00f7ff);
+      color: #000;
+      font-weight: bold;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      text-decoration: none;
+      margin: 10px;
+      display: inline-block;
+      box-shadow: 0 0 12px #00f7ff;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      width: 80%;
+      margin-top: 20px;
+      font-size: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ كود الحماية -->
+  <script type="module" src="auth-guard.js"></script>
+
+  <div class="container">
+    <h1>👤 حسابي</h1>
+    <div class="info" id="uid">معرف المستخدم: جاري التحميل...</div>
+    <div class="info" id="subDate">تاريخ انتهاء الاشتراك: ...</div>
+
+    <a class="btn" href="https://wa.me/201508038584" target="_blank">💳 تجديد الاشتراك عبر واتساب</a>
+
+    <div style="margin-top: 30px;">
+      <input type="text" id="codeInput" placeholder="ادخل كود التفعيل هنا">
+      <br>
+      <button class="btn" onclick="activateCode()">تفعيل الكود</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const db = getDatabase();
+    const uid = localStorage.getItem("customUID");
+    const userRef = ref(db, "users/" + uid);
+    document.getElementById("uid").textContent = "معرف المستخدم: " + uid;
+
+    get(userRef).then(snapshot => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        if (userData.subscriptionEnd) {
+          const end = new Date(userData.subscriptionEnd);
+          document.getElementById("subDate").textContent =
+            "تاريخ انتهاء الاشتراك: " + end.toLocaleDateString("ar-EG");
+        } else {
+          document.getElementById("subDate").textContent = "الاشتراك غير محدد المدة";
+        }
+      }
+    });
+
+    window.activateCode = async () => {
+      const code = document.getElementById("codeInput").value.trim();
+      if (!code) return alert("من فضلك أدخل كود التفعيل");
+
+      const codeRef = ref(db, "activationCodes/" + code);
+      const snapshot = await get(codeRef);
+
+      if (!snapshot.exists()) return alert("❌ كود غير صحيح");
+      if (snapshot.val().used) return alert("❌ هذا الكود مستخدم بالفعل");
+
+      const days = 30;
+      const newEnd = Date.now() + days * 24 * 60 * 60 * 1000;
+
+      await update(userRef, {
+        subscriptionEnd: newEnd
+      });
+
+      await update(codeRef, {
+        used: true,
+        usedBy: uid,
+        usedAt: Date.now()
+      });
+
+      alert("✅ تم تفعيل الاشتراك بنجاح!");
+      location.reload();
+    };
+  </script>
+</body>
+</html>

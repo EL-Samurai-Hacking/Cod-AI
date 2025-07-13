@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة المستخدم | EL Samurai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #0a0a0a;
+      font-family: 'Cairo', sans-serif;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: #111;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #ff00ff, 0 0 40px #00f7ff inset;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #ff00ff;
+      margin-bottom: 10px;
+    }
+
+    .uid, .subEnd {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #00f7ff;
+    }
+
+    .buttons {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #ff00ff, #00f7ff);
+      color: #000;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      text-decoration: none;
+      box-shadow: 0 0 15px #00f7ff;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>مرحبًا بك في EL Samurai 🥷</h1>
+    <p class="uid" id="userID">جارٍ التحميل...</p>
+    <p class="subEnd" id="subEnd">...</p>
+
+    <div class="buttons">
+      <a href="code-tools.html" class="btn">🧠 أدوات الذكاء الاصطناعي</a>
+      <a href="course.html" class="btn">🌐 أفضل كورسات مجمعة
+      <a href="learn-coding.html" class="btn">💻 تعليم البرمجة</a>
+      <a href="cyber.html" class="btn">🔐 الأمن السيبراني</a>
+      <a href="account.html" class="btn">👤 حسابي</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { auth } from './js/firebase-config.js';
+
+    const db = getDatabase();
+    const uid = localStorage.getItem("customUID");
+    const userRef = ref(db, "users/" + uid);
+
+    document.getElementById("userID").textContent = "المعرف: " + uid;
+
+    get(userRef).then(snapshot => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (data.subscriptionEnd) {
+          const endDate = new Date(data.subscriptionEnd);
+          document.getElementById("subEnd").textContent =
+            "الاشتراك ينتهي في: " + endDate.toLocaleDateString('ar-EG');
+        } else {
+          document.getElementById("subEnd").textContent = "الاشتراك غير محدد المدة";
+        }
+      } else {
+        document.getElementById("subEnd").textContent = "❌ لم يتم العثور على بيانات المستخدم";
+      }
+    });
+  </script>
+</body>
+</html>

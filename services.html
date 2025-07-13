@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>الخدمات | EL Samurai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #00f7ff;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      color: #00f7ff;
+      border-bottom: 2px solid #00f7ff;
+      margin-bottom: 15px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #111;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 0 10px #00f7ff50;
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .card-title {
+      color: #00f7ff;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 الدورات والخدمات</h1>
+  <div id="servicesContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTQ7sUS5VrIY7wIIq-BVjYYWLygCtQOHY",
+      authDomain: "el-samurai-cod-ai.firebaseapp.com",
+      projectId: "el-samurai-cod-ai",
+      storageBucket: "el-samurai-cod-ai.appspot.com",
+      messagingSenderId: "947619246455",
+      appId: "1:947619246455:web:df4fe0fae7f5d5aee73172",
+      measurementId: "G-EYR30QTGLS",
+      databaseURL: "https://el-samurai-cod-ai-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const servicesRef = ref(db, "services");
+
+    get(servicesRef).then(snapshot => {
+      if (!snapshot.exists()) return;
+
+      const data = snapshot.val();
+      const container = document.getElementById("servicesContainer");
+
+      for (const sectionId in data) {
+        const section = data[sectionId];
+        if (!section.active) continue;
+
+        const sectionDiv = document.createElement("div");
+        sectionDiv.className = "section";
+
+        const title = document.createElement("div");
+        title.className = "section-title";
+        title.textContent = section.title;
+
+        const cards = document.createElement("div");
+        cards.className = "cards";
+
+        for (const itemId in section.items) {
+          const item = section.items[itemId];
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.onclick = () => {
+            window.location.href = `course.html?section=${sectionId}&id=${itemId}`;
+          };
+
+          card.innerHTML = `
+            <img src="${item.thumbnail}" alt="${item.title}" />
+            <div class="card-title">${item.title}</div>
+            <div class="card-desc">${item.desc || ""}</div>
+          `;
+
+          cards.appendChild(card);
+        }
+
+        sectionDiv.appendChild(title);
+        sectionDiv.appendChild(cards);
+        container.appendChild(sectionDiv);
+      }
+    });
+  </script>
+</body>
+</html>

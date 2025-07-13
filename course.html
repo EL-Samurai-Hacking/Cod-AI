@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تفاصيل الدورة | EL Samurai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #111;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px #00f7ff;
+    }
+
+    h1 {
+      color: #00f7ff;
+      margin-bottom: 20px;
+      font-size: 30px;
+    }
+
+    .desc {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #ccc;
+    }
+
+    .tools {
+      margin-top: 10px;
+      padding: 15px;
+      background: #1b1b1b;
+      border-radius: 10px;
+    }
+
+    .tools ul {
+      margin: 10px 0 0 0;
+      padding-right: 20px;
+    }
+
+    .tools li {
+      margin-bottom: 5px;
+    }
+
+    .video {
+      margin-top: 30px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 420px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      box-shadow: 0 0 10px #00f7ff;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      font-size: 22px;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="mainContainer" style="display:none">
+    <img id="thumb" src="" alt="صورة الدورة" />
+    <h1 id="title">عنوان الدورة</h1>
+    <p class="desc" id="desc">وصف الدورة</p>
+
+    <div class="tools">
+      <strong>🧰 الأدوات المستخدمة:</strong>
+      <ul id="toolsList"></ul>
+    </div>
+
+    <div class="video" id="videoContainer"></div>
+  </div>
+
+  <div class="error" id="errorMsg" style="display:none">❌ لم يتم العثور على الدورة أو حدث خطأ في التحميل</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTQ7sUS5VrIY7wIIq-BVjYYWLygCtQOHY",
+      authDomain: "el-samurai-cod-ai.firebaseapp.com",
+      projectId: "el-samurai-cod-ai",
+      storageBucket: "el-samurai-cod-ai.appspot.com",
+      messagingSenderId: "947619246455",
+      appId: "1:947619246455:web:df4fe0fae7f5d5aee73172",
+      measurementId: "G-EYR30QTGLS",
+      databaseURL: "https://el-samurai-cod-ai-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+
+    const params = new URLSearchParams(window.location.search);
+    const sectionId = params.get("section");
+    const courseId = params.get("id");
+
+    if (!sectionId || !courseId) {
+      document.getElementById("errorMsg").style.display = "block";
+      throw new Error("❌ Missing section or id");
+    }
+
+    const courseRef = ref(db, `services/${sectionId}/items/${courseId}`);
+    get(courseRef).then(snapshot => {
+      if (!snapshot.exists()) {
+        document.getElementById("errorMsg").style.display = "block";
+        return;
+      }
+
+      const data = snapshot.val();
+
+      document.getElementById("title").textContent = data.title;
+      document.getElementById("desc").textContent = data.desc;
+      document.getElementById("thumb").src = data.thumbnail;
+
+      const toolsList = document.getElementById("toolsList");
+      toolsList.innerHTML = "";
+      (data.tools || []).forEach(tool => {
+        const li = document.createElement("li");
+        li.textContent = tool;
+        toolsList.appendChild(li);
+      });
+
+      if (data.video) {
+        document.getElementById("videoContainer").innerHTML = `
+          <h3>🎥 الفيديو:</h3>
+          <iframe src="${data.video}" allowfullscreen></iframe>
+        `;
+      }
+
+      document.getElementById("mainContainer").style.display = "block";
+    }).catch(() => {
+      document.getElementById("errorMsg").style.display = "block";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تسجيل الدخول | EL SAMURAI COD AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #0a0a0a, #111);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: #121212;
+      padding: 40px 30px;
+      border-radius: 18px;
+      box-shadow: 0 0 20px #a600ff, 0 0 40px #00c3ff inset;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 36px;
+      margin-bottom: 25px;
+      color: #00f7ff;
+      text-shadow: 0 0 10px #ff00ff;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 10px;
+      background: #222;
+      color: #fff;
+      font-size: 16px;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00000055 inset;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 15px #00f7ff;
+    }
+
+    .btn {
+      margin-top: 15px;
+      background: linear-gradient(45deg, #ff00ff, #00f7ff);
+      border: none;
+      padding: 12px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00f7ff;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #ff00ff;
+    }
+
+    .link {
+      margin-top: 20px;
+      display: block;
+      color: #ccc;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .link:hover {
+      color: #00f7ff;
+    }
+
+    @media (max-width: 600px) {
+      h2 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>تسجيل الدخول</h2>
+    <input type="email" id="email" placeholder="البريد الإلكتروني" />
+    <input type="password" id="password" placeholder="كلمة المرور" />
+    <button class="btn" onclick="login()">دخول</button>
+    <a class="link" href="register.html">ليس لديك حساب؟ أنشئ واحد الآن</a>
+  </div>
+
+  <script type="module">
+    import { loginUser } from './js/auth.js';
+
+    window.login = async function () {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert('يرجى ملء جميع الحقول');
+        return;
+      }
+
+      await loginUser(email, password);
+    };
+  </script>
+</body>
+</html>
